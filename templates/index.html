@@ -4,55 +4,99 @@
     <meta charset="UTF-8">
     <title>Sultangram</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; background: #afbecc; }
-        .sidebar { width: 280px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 15px; background: #2481cc; color: white; font-weight: bold; display: flex; align-items: center; gap: 10px; }
-        .logo-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: white; }
-        .chat-area { flex: 1; display: flex; flex-direction: column; }
-        .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .msg { background: white; padding: 10px 15px; border-radius: 18px 18px 18px 0; max-width: 75%; align-self: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .my-msg { align-self: flex-end; background: #effdde; border-radius: 18px 18px 0 18px; }
-        .msg img { max-width: 100%; border-radius: 10px; margin-top: 8px; display: block; }
-        .username { font-size: 0.85em; font-weight: bold; color: #2481cc; margin-bottom: 4px; }
-        .input-container { padding: 15px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; align-items: center; }
-        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #eee; border-radius: 25px; outline: none; background: #f5f5f5; }
-        .btn { background: #2481cc; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
-        .file-icon { font-size: 1.5em; cursor: pointer; color: #777; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; height: 100vh; background-color: #f0f2f5; }
+        
+        /* Sidebar */
+        .sidebar { width: 320px; background: #ffffff; border-right: 1px solid #dfe1e5; display: flex; flex-direction: column; z-index: 10; }
+        .sidebar-header { padding: 15px; background: #2481cc; color: white; display: flex; align-items: center; gap: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .logo-img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid white; }
+        .user-info { padding: 20px; border-bottom: 1px solid #f0f0f0; background: #fafafa; }
+        .chat-list-item { padding: 15px; display: flex; align-items: center; gap: 12px; background: #eff6fb; border-left: 4px solid #2481cc; cursor: pointer; }
+
+        /* Chat Window */
+        .main-chat { flex: 1; display: flex; flex-direction: column; background: url('https://web.telegram.org/a/chat-bg-pattern.light.8926065588373f3246.png'); background-color: #e7ebf0; }
+        .chat-header { padding: 10px 20px; background: white; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+        
+        .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+        
+        /* Message Bubbles */
+        .message { max-width: 75%; padding: 8px 12px; border-radius: 12px; position: relative; font-size: 15px; box-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .msg-other { align-self: flex-start; background: white; border-bottom-left-radius: 2px; }
+        .msg-my { align-self: flex-end; background: #effdde; border-bottom-right-radius: 2px; }
+        
+        .msg-user { font-weight: bold; font-size: 13px; color: #2481cc; margin-bottom: 3px; display: block; }
+        .msg-content { word-wrap: break-word; color: #000; }
+        .msg-img { max-width: 100%; border-radius: 8px; margin-top: 5px; display: block; }
+        .msg-time { font-size: 10px; color: #a0acb6; float: right; margin-top: 5px; margin-left: 8px; }
+
+        /* Input Area */
+        .footer { padding: 10px 20px; background: white; display: flex; align-items: center; gap: 15px; }
+        .input-wrap { flex: 1; position: relative; }
+        input[type="text"] { width: 100%; padding: 12px 15px; border: 1px solid #dfe1e5; border-radius: 10px; outline: none; font-size: 15px; background: #f1f1f1; }
+        .icon-btn { font-size: 20px; color: #707579; cursor: pointer; transition: 0.2s; }
+        .icon-btn:hover { color: #2481cc; }
+        .send-btn { border: none; background: none; color: #2481cc; font-weight: bold; cursor: pointer; font-size: 16px; }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <!-- Путь исправлен специально под твой logo.png в папке static -->
-            <img src="{{ url_for('static', filename='logo.png') }}" class="logo-img" onerror="this.src='https://via.placeholder.com/40'">
-            Sultangram
+
+<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="{{ url_for('static', filename='logo.png') }}" class="logo-img" onerror="this.src='https://ui-avatars.com/api/?name=Sultangram&background=2481cc&color=fff'">
+        <span style="font-size: 1.2em;">Sultangram</span>
+    </div>
+    <div class="user-info">
+        <div>👤 <b>{{ user.username }}</b></div>
+        <a href="/logout" style="font-size: 12px; color: #e53935; text-decoration: none;">Выйти из профиля</a>
+    </div>
+    <div class="chat-list-item">
+        <div style="width: 45px; height: 45px; background: #2481cc; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">OC</div>
+        <div>
+            <div style="font-weight: bold;">Общий чат</div>
+            <div style="font-size: 13px; color: #707579;">Все участники здесь</div>
         </div>
-        <div style="padding: 20px;">
-            <div style="font-size: 1.1em; margin-bottom: 10px;">Привет, <b>{{ user.username }}</b>!</div>
-            <div style="color: #2481cc; font-weight: 500;">🔵 Общий чат</div>
-        </div>
+    </div>
+</div>
+
+<div class="main-chat">
+    <div class="chat-header">
+        <div><b>Общий чат</b> <br> <span style="font-size: 12px; color: #707579;">в сети</span></div>
+        <i class="fa-solid fa-ellipsis-vertical icon-btn"></i>
     </div>
 
-    <div class="chat-area">
-        <div class="messages">
-            {% for msg in messages %}
-            <div class="msg {% if msg.username == user.username %}my-msg{% endif %}">
-                <div class="username">{{ msg.username }}</div>
-                {% if msg.content %}{{ msg.content }}{% endif %}
-                {% if msg.image_path %}
-                <img src="{{ url_for('static', filename='uploads/' + msg.image_path) }}">
-                {% endif %}
-            </div>
-            {% endfor %}
+    <div class="messages-container" id="chat">
+        {% for msg in messages %}
+        <div class="message {% if msg.username == user.username %}msg-my{% else %}msg-other{% endif %}">
+            <span class="msg-user">{{ msg.username }}</span>
+            {% if msg.image_path %}
+                <img src="{{ url_for('static', filename='uploads/' + msg.image_path) }}" class="msg-img">
+            {% endif %}
+            <div class="msg-content">{{ msg.content }}</div>
+            <span class="msg-time">{{ msg.timestamp.strftime('%H:%M') }}</span>
         </div>
-        <form class="input-container" action="/send" method="POST" enctype="multipart/form-data">
-            <label class="file-icon">
-                📷 <input type="file" name="photo" style="display:none;" accept="image/*">
-            </label>
-            <input type="text" name="text" placeholder="Напишите что-нибудь..." autocomplete="off">
-            <button type="submit" class="btn">Отправить</button>
-        </form>
+        {% endfor %}
     </div>
+
+    <form class="footer" action="/send" method="POST" enctype="multipart/form-data">
+        <label>
+            <i class="fa-solid fa-paperclip icon-btn"></i>
+            <input type="file" name="photo" style="display:none;" accept="image/*">
+        </label>
+        <div class="input-wrap">
+            <input type="text" name="text" placeholder="Напишите сообщение..." autocomplete="off">
+        </div>
+        <button type="submit" class="send-btn">ОТПРАВИТЬ</button>
+    </form>
+</div>
+
+<script>
+    // Автоматическая прокрутка вниз
+    const chat = document.getElementById('chat');
+    chat.scrollTop = chat.scrollHeight;
+</script>
+
 </body>
 </html>
