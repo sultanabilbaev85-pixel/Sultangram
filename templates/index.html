@@ -1,53 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>IME Messenger</title>
+    <title>Sultangram</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; height: 100vh; background: #e6ebee; }
-        .sidebar { width: 300px; background: #ffffff; border-right: 1px solid #dcdcdc; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 15px; background: #0088cc; color: white; font-size: 1.2em; font-weight: bold; }
-        .chat-list { flex: 1; overflow-y: auto; }
-        .chat-item { padding: 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer; transition: 0.2s; }
-        .chat-item:hover { background: #f2f6fa; }
-        .chat-item.active { background: #e7f2fb; border-left: 4px solid #0088cc; }
-        
-        .chat-window { flex: 1; display: flex; flex-direction: column; background: #f5f5f5; }
-        .chat-header { padding: 15px; background: white; border-bottom: 1px solid #ddd; font-weight: bold; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #dee3e6; }
+        .sidebar { width: 280px; background: #ffffff; border-right: 1px solid #c8cfd3; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 15px; background: #2481cc; color: white; font-weight: bold; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; }
         .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        
-        .msg { max-width: 70%; padding: 10px 15px; border-radius: 15px; font-size: 0.95em; position: relative; line-height: 1.4; }
-        .my-msg { align-self: flex-end; background: #effdde; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-        .other-msg { align-self: flex-start; background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
-
-        .input-bar { padding: 15px; background: white; display: flex; align-items: center; gap: 10px; border-top: 1px solid #ddd; }
-        input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; }
-        .btn { background: #0088cc; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        .msg { background: white; padding: 10px 15px; border-radius: 12px; max-width: 70%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .my-msg { align-self: flex-end; background: #effdde; }
+        .input-bar { padding: 15px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        button { background: #2481cc; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
-        <div class="sidebar-header">IME Messenger</div>
-        <div class="chat-list">
-            <div class="chat-item active"><b>📢 Общий канал</b></div>
-            <div class="chat-item">👥 Группа разработчиков</div>
-            <div class="chat-item">🔒 Личные сообщения</div>
-            <div style="padding: 15px; color: #0088cc; font-weight: bold; cursor: pointer;">+ Создать канал</div>
+        <div class="sidebar-header">
+            <div style="width:30px; height:30px; background:white; border-radius:50%;"></div>
+            Sultangram
         </div>
+        <div style="padding: 15px;">Привет, <b>{{ user.username }}</b></div>
+        <div style="flex:1; padding: 15px; color: #666;">📢 Общий чат</div>
+        <a href="/login" style="padding: 15px; color: red; text-decoration: none;">Выход</a>
     </div>
-
-    <div class="chat-window">
-        <div class="chat-header">📢 Общий канал</div>
-        <div class="messages" id="chat-box">
-            <div class="msg other-msg"><b>Система:</b> Добро пожаловать в IME! Здесь вы можете общаться.</div>
+    <div class="chat-area">
+        <div class="messages">
+            {% for msg in messages %}
+            <div class="msg {% if msg.username == user.username %}my-msg{% endif %}">
+                <small style="color: #2481cc;">{{ msg.username }}</small><br>
+                {{ msg.content }}
+            </div>
+            {% endfor %}
         </div>
-        <div class="input-bar">
-            <button class="btn" style="background: #ccc; width: 45px;">📎</button>
-            <input type="text" placeholder="Напишите сообщение...">
-            <button class="btn">Отправить</button>
-        </div>
+        <form class="input-bar" action="/send" method="POST">
+            <input type="text" name="text" placeholder="Напишите сообщение..." required>
+            <button type="submit">Отправить</button>
+        </form>
     </div>
-
 </body>
 </html>
