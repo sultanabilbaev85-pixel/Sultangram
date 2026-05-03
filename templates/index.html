@@ -4,39 +4,44 @@
     <title>Sultangram</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #dee3e6; }
-        .sidebar { width: 280px; background: #ffffff; border-right: 1px solid #c8cfd3; display: flex; flex-direction: column; }
-        .sidebar-header { padding: 15px; background: #2481cc; color: white; font-weight: bold; font-size: 1.2em; display: flex; align-items: center; gap: 10px; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: #e6ebee; }
+        .sidebar { width: 280px; background: white; border-right: 1px solid #ddd; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 15px; background: #2481cc; color: white; font-weight: bold; }
         .chat-area { flex: 1; display: flex; flex-direction: column; }
         .messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { background: white; padding: 10px 15px; border-radius: 12px; max-width: 70%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .msg { background: white; padding: 10px; border-radius: 12px; max-width: 70%; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
         .my-msg { align-self: flex-end; background: #effdde; }
-        .input-bar { padding: 15px; background: white; border-top: 1px solid #ddd; display: flex; gap: 10px; }
-        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        .msg img { max-width: 100%; border-radius: 8px; margin-top: 5px; }
+        .input-bar { padding: 15px; background: white; display: flex; gap: 10px; border-top: 1px solid #ddd; }
+        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        .file-label { cursor: pointer; background: #f0f0f0; padding: 10px; border-radius: 50%; }
         button { background: #2481cc; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <div class="sidebar-header">
-            <div style="width:30px; height:30px; background:white; border-radius:50%;"></div>
-            Sultangram
-        </div>
-        <div style="padding: 15px;">Привет, <b>{{ user.username }}</b></div>
-        <div style="flex:1; padding: 15px; color: #666;">📢 Общий чат</div>
-        <a href="/login" style="padding: 15px; color: red; text-decoration: none;">Выход</a>
+        <div class="sidebar-header">Sultangram</div>
+        <div style="padding: 15px;">👤 <b>{{ user.username }}</b></div>
+        <div style="padding: 15px; color: #2481cc;">📢 Общий чат</div>
     </div>
     <div class="chat-area">
         <div class="messages">
             {% for msg in messages %}
             <div class="msg {% if msg.username == user.username %}my-msg{% endif %}">
-                <small style="color: #2481cc;">{{ msg.username }}</small><br>
-                {{ msg.content }}
+                <small style="color: #2481cc; font-weight: bold;">{{ msg.username }}</small><br>
+                {% if msg.content %}{{ msg.content }}{% endif %}
+                {% if msg.image_path %}
+                <br><img src="{{ url_for('static', filename='uploads/' + msg.image_path) }}">
+                {% endif %}
             </div>
             {% endfor %}
         </div>
-        <form class="input-bar" action="/send" method="POST">
-            <input type="text" name="text" placeholder="Напишите сообщение..." required>
+        <!-- Важно: enctype="multipart/form-data" позволяет отправлять файлы -->
+        <form class="input-bar" action="/send" method="POST" enctype="multipart/form-data">
+            <label class="file-label">
+                📷 <input type="file" name="photo" style="display:none;" accept="image/*">
+            </label>
+            <input type="text" name="text" placeholder="Напишите сообщение...">
             <button type="submit">Отправить</button>
         </form>
     </div>
