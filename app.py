@@ -6,9 +6,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'sultangram-secret-key'
+app.config['SECRET_KEY'] = 'sultangram-super-secret'
+# База данных будет сохраняться в файл sultangram.db
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///sultangram.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# Создаем папку для загрузок, если её нет
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
@@ -22,7 +27,7 @@ class User(UserMixin, db.Model):
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(500))
-    image_path = db.Column(db.String(200)) # Поле для хранения имени картинки
+    image_path = db.Column(db.String(200))
     username = db.Column(db.String(150))
 
 @login_manager.user_loader
@@ -64,11 +69,15 @@ def login():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        hash_pw = generate_password_hash(request.form.get('password'), method='pbkdf2:sha256')
+        # Хешируем пароль для безопасности
+        hash_pw = generate_password_hash(request.form.get('password'))
         new_user = User(username=request.form.get('username'), password=hash_pw)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('login'))
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        except:
+            return "Этот ник уже занят!"
     return render_template('register.html')
 
 if __name__ == '__main__':
